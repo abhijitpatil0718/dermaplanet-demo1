@@ -1,0 +1,21 @@
+<li class="appt">
+  <div class="appt-when">
+    <strong>{{ a['appointment_date']|fdate }}</strong>
+    <span>{{ a['appointment_time']|ftime }}</span>
+  </div>
+  <div class="appt-main">
+    <h3>{{ a['doctor_name'] }}</h3>
+    <p class="muted">{{ a['doctor_spec'] }}</p>
+    <p class="appt-problem">{{ a['problem'] }}</p>
+    {% if a['admin_note'] %}<p class="appt-note"><strong>Note from the clinic:</strong> {{ a['admin_note'] }}</p>{% endif %}
+  </div>
+  <div class="appt-side">
+    <span class="badge badge-{{ a['status']|lower }}">{{ a['status'] }}</span>
+    {% if a['status'] in ('Pending', 'Approved') and a['appointment_date'] >= today %}
+      <form method="post" action="{{ url_for('cancel_appointment', appt_id=a['id']) }}" class="inline-form">
+        {{ csrf_field() }}
+        <button type="submit" class="link link-danger" data-confirm="Cancel this appointment?">Cancel</button>
+      </form>
+    {% endif %}
+  </div>
+</li>

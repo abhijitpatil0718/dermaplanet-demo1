@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}My appointments | DermaPlanet{% endblock %}
+{% block content %}
+<section class="page-head">
+  <h1>My appointments</h1>
+  <p class="lead">Every booking you have made, newest first.</p>
+</section>
+<section class="section">
+  <div class="section-head">
+    <h2>{{ appointments|length }} booking{{ '' if appointments|length == 1 else 's' }}</h2>
+    <a class="btn btn-primary" href="{{ url_for('appointment') }}">Book appointment</a>
+  </div>
+  {% if appointments %}
+    <ul class="appt-list">
+      {% for a in appointments %}{% include "partials/appt_item.html" %}{% endfor %}
+    </ul>
+  {% else %}
+    <p class="empty">No appointments yet. <a href="{{ url_for('appointment') }}">Book your first one</a>.</p>
+  {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Book an appointment | DermaPlanet{% endblock %}
+{% block content %}
+<section class="page-head">
+  <h1>Book an appointment</h1>
+  <p class="lead">Choose a doctor and date, then pick one of the free time slots.</p>
+</section>
+
+<section class="section">
+  <form class="form-card form-wide appointment-form" method="post" novalidate
+        data-slots-url="{{ url_for('api_slots') }}" data-selected-time="{{ form.time }}">
+    {{ csrf_field() }}
+
+    <fieldset>
+      <legend>Patient details</legend>
+      <div class="grid-2">
+        <div>
+          <label for="name">Full name</label>
+          <input id="name" name="name" type="text" maxlength="80" autocomplete="name" value="{{ form.name }}" required>
+        </div>
+        <div>
+          <label for="phone">Mobile number</label>
+          <input id="phone" name="phone" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="10-digit number" value="{{ form.phone }}" required>
+        </div>
+      </div>
+      <label for="email">Email</label>
+      <input id="email" name="email" type="email" autocomplete="email" value="{{ form.email }}" required>
+    </fieldset>
+
+    <fieldset>
+      <legend>Doctor and time</legend>
+      {% if doctors %}
+      <div class="grid-2">
+        <div>
+          <label for="doctor">Doctor</label>
+          <select id="doctor" name="doctor" required>
+            <option value="" {% if not form.doctor %}selected{% endif %}>Choose a doctor</option>
+            {% for d in doctors %}
+              <option value="{{ d['id'] }}" {% if form.doctor|string == d['id']|string %}selected{% endif %}>{{ d['name'] }} - {{ d['specialization'] }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label for="date">Date</label>
+          <input id="date" name="date" type="date" min="{{ min_date }}" max="{{ max_date }}" value="{{ form.date or request.args.get('date', '') }}" required>
+        </div>
+      </div>
+
+      <p class="field-label" id="slots-label">Available times</p>
+      <div class="slots" id="slots" role="radiogroup" aria-labelledby="slots-label" aria-live="polite">
+        <p class="muted slots-msg">Choose a doctor and date to see free times.</p>
+      </div>
+      {% else %}
+        <p class="empty">No doctors are accepting bookings right now. Please <a href="{{ url_for('contact') }}">contact the clinic</a>.</p>
+      {% endif %}
+    </fieldset>
+
+    <fieldset>
+      <legend>Your concern</legend>
+      <label for="problem">What would you like the doctor to look at?</label>
+      <textarea id="problem" name="problem" rows="5" maxlength="1000" placeholder="For example: acne on the cheeks for six months, or hair thinning at the crown" required>{{ form.problem }}</textarea>
+    </fieldset>
+
+    <button class="btn btn-primary btn-lg" type="submit" {% if not doctors %}disabled{% endif %}>Request appointment</button>
+    <p class="hint">The clinic reviews each request. You will see Approved or Rejected on your appointments page.</p>
+  </form>
+</section>
+{% endblock %}

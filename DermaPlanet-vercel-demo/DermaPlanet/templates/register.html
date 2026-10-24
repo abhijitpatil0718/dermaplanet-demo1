@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Create account | DermaPlanet{% endblock %}
+{% block content %}
+<section class="auth">
+  <form class="form-card" method="post" novalidate>
+    {{ csrf_field() }}
+    <h1>Create your account</h1>
+    <p class="muted">One account for booking, tracking and cancelling appointments.</p>
+    <label for="name">Full name</label>
+    <input id="name" name="name" type="text" maxlength="80" autocomplete="name" value="{{ form.get('name', '') }}" required autofocus>
+    <label for="email">Email</label>
+    <input id="email" name="email" type="email" autocomplete="email" value="{{ form.get('email', '') }}" required>
+    <label for="phone">Mobile number</label>
+    <input id="phone" name="phone" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="10-digit number" value="{{ form.get('phone', '') }}" required>
+    <label for="password">Password</label>
+    <input id="password" name="password" type="password" autocomplete="new-password" minlength="8" aria-describedby="pw-help" required>
+    <p class="hint" id="pw-help">At least 8 characters, with a letter and a number.</p>
+    <label for="confirm">Confirm password</label>
+    <input id="confirm" name="confirm" type="password" autocomplete="new-password" required>
+    <button class="btn btn-primary btn-block" type="submit">Create account</button>
+    <p class="form-foot">Already registered? <a href="{{ url_for('login') }}">Log in</a></p>
+  </form>
+</section>
+{% endblock %}

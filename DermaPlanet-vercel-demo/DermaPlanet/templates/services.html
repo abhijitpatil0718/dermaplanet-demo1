@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Services | DermaPlanet{% endblock %}
+{% block content %}
+<section class="page-head">
+  <h1>Dermatology services</h1>
+  <p class="lead">Not sure which treatment you need? Book a consultation and the doctor will advise.</p>
+</section>
+<section class="section">
+  <ul class="service-list service-list-wide">
+    {% for name, concern, text in services %}
+    <li>
+      <h3>{{ name }}</h3>
+      <p class="concern">{{ concern }}</p>
+      <p>{{ text }}</p>
+    </li>
+    {% endfor %}
+  </ul>
+  <p class="center"><a class="btn btn-primary btn-lg" href="{{ url_for('appointment') }}">Book appointment</a></p>
+</section>
+{% endblock %}

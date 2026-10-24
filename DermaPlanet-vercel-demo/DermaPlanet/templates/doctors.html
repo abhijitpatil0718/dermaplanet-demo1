@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Our doctors | DermaPlanet{% endblock %}
+{% block content %}
+<section class="page-head">
+  <h1>Our dermatologists</h1>
+  <p class="lead">Experienced specialists for skin, hair and laser treatments.</p>
+</section>
+<section class="section">
+  {% if doctors %}
+  <div class="doctor-grid">
+    {% for d in doctors %}{% include "partials/doctor_card.html" %}{% endfor %}
+  </div>
+  {% else %}
+  <p class="empty">Our doctors' profiles are being updated. Please check back soon, or <a href="{{ url_for('contact') }}">contact the clinic</a>.</p>
+  {% endif %}
+</section>
+{% endblock %}

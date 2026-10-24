@@ -1,0 +1,104 @@
+{% extends "admin/base_admin.html" %}
+{% block admin_title %}Appointments{% endblock %}
+{% block admin_content %}
+{% if default_pw %}
+  <div class="notice notice-warn">You are still using the default admin password. <a href="{{ url_for('profile') }}">Change it now</a>.</div>
+{% endif %}
+
+<div class="stat-row">
+  <div class="stat"><strong>{{ stats.today }}</strong><span>Today</span></div>
+  <div class="stat"><strong>{{ stats.pending }}</strong><span>Pending requests</span></div>
+  <div class="stat"><strong>{{ stats.patients }}</strong><span>Patients</span></div>
+  <div class="stat"><strong>{{ stats.doctors }}</strong><span>Active doctors</span></div>
+  <div class="stat"><strong>{{ stats.unread }}</strong><span>Unread messages</span></div>
+</div>
+
+<div class="chips" aria-label="Filter by status">
+  <a class="chip {% if not status %}is-active{% endif %}" href="{{ url_for('admin_dashboard') }}">All</a>
+  {% for s in statuses %}
+    <a class="chip {% if s == status %}is-active{% endif %}" href="{{ url_for('admin_dashboard', status=s) }}">{{ s }} <span>{{ status_counts.get(s, 0) }}</span></a>
+  {% endfor %}
+</div>
+
+<form class="filters" method="get">
+  <div>
+    <label for="q">Search</label>
+    <input id="q" name="q" type="search" placeholder="Name, email or phone" value="{{ q }}">
+  </div>
+  <div>
+    <label for="status">Status</label>
+    <select id="status" name="status">
+      <option value="">All</option>
+      {% for s in statuses %}<option value="{{ s }}" {% if s == status %}selected{% endif %}>{{ s }}</option>{% endfor %}
+    </select>
+  </div>
+  <div>
+    <label for="when">When</label>
+    <select id="when" name="when">
+      <option value="" {% if not when %}selected{% endif %}>Any date</option>
+      <option value="today" {% if when == 'today' %}selected{% endif %}>Today</option>
+      <option value="upcoming" {% if when == 'upcoming' %}selected{% endif %}>Today and later</option>
+    </select>
+  </div>
+  <div class="filters-actions">
+    <button class="btn btn-primary" type="submit">Apply</button>
+    {% if q or status or when %}<a class="btn btn-ghost" href="{{ url_for('admin_dashboard') }}">Clear</a>{% endif %}
+    <a class="btn btn-ghost" href="{{ url_for('admin_export_appointments', q=q, status=status, when=when) }}">Export CSV</a>
+  </div>
+</form>
+
+{% if appointments %}
+<div class="table-wrap">
+  <table class="table">
+    <thead>
+      <tr><th>Patient</th><th>Doctor</th><th>When</th><th>Concern</th><th>Status</th><th>Actions</th></tr>
+    </thead>
+    <tbody>
+    {% for a in appointments %}
+      <tr>
+        <td data-label="Patient">
+          <a class="table-link" href="{{ url_for('admin_appointment', appt_id=a['id']) }}"><strong>{{ a['patient_name'] }}</strong></a><br>
+          <span class="muted">{{ a['phone'] }}<br>{{ a['email'] }}</span>
+        </td>
+        <td data-label="Doctor">{{ a['doctor_name'] }}</td>
+        <td data-label="When">{{ a['appointment_date']|fdate }}<br>{{ a['appointment_time']|ftime }}
+          {% if a['appointment_date'] == today %}<span class="tag">Today</span>{% endif %}</td>
+        <td data-label="Concern" class="cell-wrap">{{ a['problem'] }}{% if a['admin_note'] %}<br><span class="muted">Note: {{ a['admin_note'] }}</span>{% endif %}</td>
+        <td data-label="Status"><span class="badge badge-{{ a['status']|lower }}">{{ a['status'] }}</span></td>
+        <td data-label="Actions">
+          <div class="row-actions">
+            <a class="btn btn-sm btn-ghost" href="{{ url_for('admin_appointment', appt_id=a['id']) }}">Details</a>
+            {% if a['status'] == 'Pending' %}
+              <form method="post" action="{{ url_for('admin_set_status', appt_id=a['id']) }}" class="inline-form">
+                {{ csrf_field() }}<input type="hidden" name="status" value="Approved">
+                <button class="btn btn-sm btn-primary" type="submit">Approve</button>
+              </form>
+              <form method="post" action="{{ url_for('admin_set_status', appt_id=a['id']) }}" class="inline-form">
+                {{ csrf_field() }}<input type="hidden" name="status" value="Rejected">
+                <button class="btn btn-sm btn-outline" type="submit" data-confirm="Reject this request?">Reject</button>
+              </form>
+            {% elif a['status'] == 'Approved' %}
+              <form method="post" action="{{ url_for('admin_set_status', appt_id=a['id']) }}" class="inline-form">
+                {{ csrf_field() }}<input type="hidden" name="status" value="Completed">
+                <button class="btn btn-sm btn-primary" type="submit">Mark completed</button>
+              </form>
+              <form method="post" action="{{ url_for('admin_set_status', appt_id=a['id']) }}" class="inline-form">
+                {{ csrf_field() }}<input type="hidden" name="status" value="Cancelled">
+                <button class="btn btn-sm btn-outline" type="submit" data-confirm="Cancel this appointment?">Cancel</button>
+              </form>
+            {% endif %}
+            <form method="post" action="{{ url_for('admin_delete_appointment', appt_id=a['id']) }}" class="inline-form">
+              {{ csrf_field() }}
+              <button class="link link-danger" type="submit" data-confirm="Delete this appointment permanently?">Delete</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+  <p class="empty">No appointments match these filters.</p>
+{% endif %}
+{% endblock %}

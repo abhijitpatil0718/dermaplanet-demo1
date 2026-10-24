@@ -1,0 +1,39 @@
+{% extends "admin/base_admin.html" %}
+{% block admin_title %}{{ patient['name'] }}{% endblock %}
+{% block admin_content %}
+<p><a class="text-link" href="{{ url_for('admin_patients') }}">Back to patients</a></p>
+<div class="form-card form-wide detail-card">
+  <dl class="facts">
+    <dt>Email</dt><dd><a href="mailto:{{ patient['email'] }}">{{ patient['email'] }}</a></dd>
+    <dt>Phone</dt><dd><a href="tel:{{ patient['phone'] }}">{{ patient['phone'] }}</a></dd>
+    <dt>Joined</dt><dd>{{ patient['created_at'][:10]|fdate }}</dd>
+    <dt>Bookings</dt><dd>{{ appointments|length }}</dd>
+  </dl>
+  <form method="post" action="{{ url_for('admin_delete_patient', user_id=patient['id']) }}">
+    {{ csrf_field() }}
+    <button class="link link-danger" type="submit" data-confirm="Delete this patient and all of their appointments? This cannot be undone.">Delete patient</button>
+  </form>
+</div>
+
+<h2 class="spaced">Appointments</h2>
+{% if appointments %}
+<div class="table-wrap">
+  <table class="table">
+    <thead><tr><th>When</th><th>Doctor</th><th>Concern</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+    {% for a in appointments %}
+      <tr>
+        <td data-label="When">{{ a['appointment_date']|fdate }}<br>{{ a['appointment_time']|ftime }}</td>
+        <td data-label="Doctor">{{ a['doctor_name'] }}</td>
+        <td data-label="Concern" class="cell-wrap">{{ a['problem'] }}</td>
+        <td data-label="Status"><span class="badge badge-{{ a['status']|lower }}">{{ a['status'] }}</span></td>
+        <td data-label="Open"><a class="btn btn-sm btn-ghost" href="{{ url_for('admin_appointment', appt_id=a['id']) }}">Details</a></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+  <p class="empty">This patient has not booked anything yet.</p>
+{% endif %}
+{% endblock %}

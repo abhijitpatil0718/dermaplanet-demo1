@@ -1,0 +1,43 @@
+{% extends "admin/base_admin.html" %}
+{% block admin_title %}Staff accounts{% endblock %}
+{% block admin_content %}
+<div class="two-col">
+  <div>
+    <h2>Admins</h2>
+    <div class="table-wrap">
+      <table class="table">
+        <thead><tr><th>Name</th><th>Email</th><th></th></tr></thead>
+        <tbody>
+        {% for u in admins %}
+          <tr>
+            <td data-label="Name"><strong>{{ u['name'] }}</strong>{% if u['id'] == g.user['id'] %} <span class="tag">You</span>{% endif %}</td>
+            <td data-label="Email">{{ u['email'] }}</td>
+            <td data-label="Action">
+              {% if u['id'] != g.user['id'] %}
+              <form method="post" action="{{ url_for('admin_remove_staff', user_id=u['id']) }}" class="inline-form">
+                {{ csrf_field() }}
+                <button class="link link-danger" type="submit" data-confirm="Remove {{ u['name'] }}'s admin account?">Remove</button>
+              </form>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <form class="form-card" method="post" novalidate>
+    {{ csrf_field() }}
+    <h2>Add an admin</h2>
+    <label for="name">Name</label>
+    <input id="name" name="name" type="text" maxlength="80" value="{{ form.get('name', '') }}" required>
+    <label for="email">Email</label>
+    <input id="email" name="email" type="email" autocomplete="off" value="{{ form.get('email', '') }}" required>
+    <label for="password">Temporary password</label>
+    <input id="password" name="password" type="password" autocomplete="new-password" minlength="8" required>
+    <p class="hint">At least 8 characters, with a letter and a number. They can change it from their profile.</p>
+    <button class="btn btn-primary" type="submit">Create admin</button>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}{% block admin_title %}Admin{% endblock %} | DermaPlanet{% endblock %}
+{% block content %}
+<section class="admin-head">
+  <h1>{{ self.admin_title() }}</h1>
+  <nav class="subnav" aria-label="Admin">
+    <a href="{{ url_for('admin_dashboard') }}" {% if request.endpoint in ('admin_dashboard', 'admin_appointment') %}aria-current="page"{% endif %}>Appointments</a>
+    <a href="{{ url_for('admin_doctors') }}" {% if request.endpoint in ('admin_doctors', 'add_doctor', 'edit_doctor') %}aria-current="page"{% endif %}>Doctors</a>
+    <a href="{{ url_for('admin_patients') }}" {% if request.endpoint in ('admin_patients', 'admin_patient') %}aria-current="page"{% endif %}>Patients</a>
+    <a href="{{ url_for('admin_messages') }}" {% if request.endpoint == 'admin_messages' %}aria-current="page"{% endif %}>Messages</a>
+    <a href="{{ url_for('admin_staff') }}" {% if request.endpoint == 'admin_staff' %}aria-current="page"{% endif %}>Staff</a>
+  </nav>
+</section>
+<section class="section admin-body">
+  {% block admin_content %}{% endblock %}
+</section>
+{% endblock %}

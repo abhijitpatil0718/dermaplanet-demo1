@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Staff login | DermaPlanet{% endblock %}
+{% block content %}
+<section class="auth">
+  <form class="form-card" method="post" novalidate>
+    {{ csrf_field() }}
+    <h1>Staff login</h1>
+    <p class="muted">For clinic administrators only.</p>
+    <label for="email">Admin email</label>
+    <input id="email" name="email" type="email" autocomplete="username" value="{{ email }}" required autofocus>
+    <label for="password">Password</label>
+    <input id="password" name="password" type="password" autocomplete="current-password" required>
+    <button class="btn btn-primary btn-block" type="submit">Log in</button>
+    <p class="form-foot">Not staff? <a href="{{ url_for('login') }}">Patient login</a></p>
+  </form>
+</section>
+{% endblock %}

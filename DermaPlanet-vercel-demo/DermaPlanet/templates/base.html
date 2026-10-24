@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1a7f5c">
+  <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+  <title>{% block title %}DermaPlanet | Dermatology clinic in Pune{% endblock %}</title>
+  <meta name="description" content="{% block description %}Skin, hair and laser treatments from experienced dermatologists, with simple online appointment booking.{% endblock %}">
+  <link rel="icon" href="{{ url_for('static', filename='images/favicon.svg') }}" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="{% block body_class %}{% endblock %}">
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <nav class="nav" aria-label="Main">
+      <a class="brand" href="{{ url_for('home') }}" aria-label="DermaPlanet home">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle class="mk-bg" cx="16" cy="16" r="15"/>
+          <g fill="none" class="mk-line" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10 8v5a5 5 0 0 0 10 0V8"/>
+            <path d="M15 18v3a4.5 4.5 0 0 0 9 0v-2"/>
+          </g>
+          <circle class="mk-fill" cx="10" cy="7.5" r="1.5"/>
+          <circle class="mk-fill" cx="20" cy="7.5" r="1.5"/>
+          <circle class="mk-fill" cx="24" cy="17.2" r="2.6"/>
+          <circle class="mk-dot" cx="24" cy="17.2" r="1"/>
+        </svg>
+        <span>Derma<b>Planet</b></span>
+      </a>
+
+      <div class="nav-menu" id="nav-menu">
+        <ul class="nav-links">
+          <li><a href="{{ url_for('home') }}" {% if request.endpoint == 'home' %}aria-current="page"{% endif %}>Home</a></li>
+          <li><a href="{{ url_for('about') }}" {% if request.endpoint == 'about' %}aria-current="page"{% endif %}>About</a></li>
+          <li><a href="{{ url_for('services') }}" {% if request.endpoint == 'services' %}aria-current="page"{% endif %}>Services</a></li>
+          <li><a href="{{ url_for('doctors') }}" {% if request.endpoint == 'doctors' %}aria-current="page"{% endif %}>Doctors</a></li>
+          <li><a href="{{ url_for('contact') }}" {% if request.endpoint == 'contact' %}aria-current="page"{% endif %}>Contact</a></li>
+        </ul>
+        <div class="nav-actions">
+          {% if g.user %}
+            {% if g.user['is_admin'] %}
+              <a class="link" href="{{ url_for('admin_dashboard') }}">Admin</a>
+            {% else %}
+              <a class="link" href="{{ url_for('my_appointments') }}">My appointments</a>
+            {% endif %}
+            <a class="link" href="{{ url_for('profile') }}">{{ 'Profile' if g.user['is_admin'] else g.user['name'].split()[0] }}</a>
+            <form method="post" action="{{ url_for('logout') }}" class="inline-form">
+              {{ csrf_field() }}
+              <button class="link" type="submit">Log out</button>
+            </form>
+          {% else %}
+            <a class="link" href="{{ url_for('login') }}">Log in</a>
+            <a class="link" href="{{ url_for('admin_login') }}">Admin</a>
+          {% endif %}
+          {% if not (g.user and g.user['is_admin']) %}
+            <a class="btn btn-primary" href="{{ url_for('appointment') }}">Book appointment</a>
+          {% endif %}
+        </div>
+      </div>
+      <div class="nav-tools">
+        <button class="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false" title="Switch light or dark theme">
+          <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>
+          <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        </button>
+
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu">
+        <span class="sr-only">Menu</span>
+        <span class="bars" aria-hidden="true"></span>
+      </button>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flashes" role="status" aria-live="polite">
+          {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">
+              <span>{{ message }}</span>
+              <button type="button" class="flash-close" aria-label="Dismiss message">&times;</button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-grid">
+      <div>
+        <p class="footer-brand">Derma<b>Planet</b></p>
+        <p>Skin, hair and laser care from dermatologists who explain every step.</p>
+      </div>
+      <div>
+        <p class="footer-title">Visit</p>
+        <p>{{ clinic.address }}</p>
+        <p>{{ clinic.hours }}</p>
+      </div>
+      <div>
+        <p class="footer-title">Contact</p>
+        <p><a href="tel:{{ clinic.phone|replace(' ', '') }}">{{ clinic.phone }}</a></p>
+        <p><a href="mailto:{{ clinic.email }}">{{ clinic.email }}</a></p>
+      </div>
+      <div>
+        <p class="footer-title">Patients</p>
+        <p><a href="{{ url_for('appointment') }}">Book an appointment</a></p>
+        <p><a href="{{ url_for('login') }}">Log in</a> or <a href="{{ url_for('register') }}">create an account</a></p>
+        <p><a href="{{ url_for('admin_login') }}">Staff login</a></p>
+      </div>
+    </div>
+    <p class="copyright">&copy; {{ current_year }} DermaPlanet. All rights reserved.</p>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/script.js') }}" defer></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

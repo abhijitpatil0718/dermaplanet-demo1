@@ -1,0 +1,24 @@
+{% extends "admin/base_admin.html" %}
+{% block admin_title %}Patients{% endblock %}
+{% block admin_content %}
+{% if patients %}
+<div class="table-wrap">
+  <table class="table">
+    <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Bookings</th><th>Joined</th></tr></thead>
+    <tbody>
+    {% for p in patients %}
+      <tr>
+        <td data-label="Name"><a class="table-link" href="{{ url_for('admin_patient', user_id=p['id']) }}"><strong>{{ p['name'] }}</strong></a></td>
+        <td data-label="Email">{{ p['email'] }}</td>
+        <td data-label="Phone">{{ p['phone'] }}</td>
+        <td data-label="Bookings">{{ p['visits'] }}</td>
+        <td data-label="Joined">{{ p['created_at'][:10]|fdate }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+  <p class="empty">No patients have registered yet.</p>
+{% endif %}
+{% endblock %}

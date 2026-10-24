@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Dashboard | DermaPlanet{% endblock %}
+{% block content %}
+<section class="page-head">
+  <h1>Hello, {{ g.user['name'].split()[0] }}</h1>
+  <p class="lead">Your upcoming visits and booking history.</p>
+</section>
+
+<section class="section">
+  <div class="stat-row">
+    <div class="stat"><strong>{{ upcoming|length }}</strong><span>Upcoming</span></div>
+    <div class="stat"><strong>{{ counts.get('Pending', 0) }}</strong><span>Waiting for confirmation</span></div>
+    <div class="stat"><strong>{{ counts.get('Completed', 0) }}</strong><span>Completed visits</span></div>
+    <div class="stat"><strong>{{ total }}</strong><span>Total bookings</span></div>
+  </div>
+
+  <div class="section-head">
+    <h2>Upcoming appointments</h2>
+    <a class="btn btn-primary" href="{{ url_for('appointment') }}">Book appointment</a>
+  </div>
+  {% if upcoming %}
+    <ul class="appt-list">
+      {% for a in upcoming %}
+        {% include "partials/appt_item.html" %}
+      {% endfor %}
+    </ul>
+    <p><a class="text-link" href="{{ url_for('my_appointments') }}">See full history</a></p>
+  {% else %}
+    <p class="empty">You have nothing booked. <a href="{{ url_for('appointment') }}">Book your first appointment</a>.</p>
+  {% endif %}
+</section>
+{% endblock %}

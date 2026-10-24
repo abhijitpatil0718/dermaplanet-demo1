@@ -1,0 +1,73 @@
+{% extends "admin/base_admin.html" %}
+{% block admin_title %}Appointment #{{ a['id'] }}{% endblock %}
+{% block admin_content %}
+<p><a class="text-link" href="{{ url_for('admin_dashboard') }}">Back to appointments</a></p>
+
+<div class="detail-grid">
+  <div class="form-card form-wide detail-card">
+    <h2>Details</h2>
+    <dl class="facts">
+      <dt>Patient</dt><dd>{{ a['patient_name'] }}</dd>
+      <dt>Phone</dt><dd><a href="tel:{{ a['phone'] }}">{{ a['phone'] }}</a></dd>
+      <dt>Email</dt><dd><a href="mailto:{{ a['email'] }}">{{ a['email'] }}</a></dd>
+      <dt>Doctor</dt><dd>{{ a['doctor_name'] }} ({{ a['doctor_spec'] }})</dd>
+      <dt>When</dt><dd>{{ a['appointment_date']|fdate }} at {{ a['appointment_time']|ftime }}</dd>
+      <dt>Status</dt><dd><span class="badge badge-{{ a['status']|lower }}">{{ a['status'] }}</span></dd>
+      <dt>Concern</dt><dd class="cell-wrap">{{ a['problem'] }}</dd>
+      <dt>Requested</dt><dd>{{ a['created_at'][:16] }}</dd>
+    </dl>
+
+    <div class="row-actions">
+      {% for target, label, cls in [('Approved','Approve','btn-primary'), ('Rejected','Reject','btn-outline'), ('Completed','Mark completed','btn-outline'), ('Cancelled','Cancel','btn-outline'), ('Pending','Set to pending','btn-ghost')] %}
+        {% if target != a['status'] %}
+        <form method="post" action="{{ url_for('admin_set_status', appt_id=a['id']) }}" class="inline-form">
+          {{ csrf_field() }}<input type="hidden" name="status" value="{{ target }}">
+          <button class="btn btn-sm {{ cls }}" type="submit">{{ label }}</button>
+        </form>
+        {% endif %}
+      {% endfor %}
+      <form method="post" action="{{ url_for('admin_delete_appointment', appt_id=a['id']) }}" class="inline-form">
+        {{ csrf_field() }}
+        <button class="link link-danger" type="submit" data-confirm="Delete this appointment permanently?">Delete</button>
+      </form>
+    </div>
+  </div>
+
+  <form class="form-card form-wide" method="post" novalidate>
+    {{ csrf_field() }}<input type="hidden" name="action" value="note">
+    <h2>Note for the patient</h2>
+    <label for="note">Shown on the patient's appointments page (for example, "Please arrive 10 minutes early")</label>
+    <textarea id="note" name="note" rows="3" maxlength="500">{{ a['admin_note'] or '' }}</textarea>
+    <button class="btn btn-primary" type="submit">Save note</button>
+  </form>
+
+  {% if a['status'] in ('Pending', 'Approved') %}
+  <form class="form-card form-wide appointment-form" method="post" novalidate
+        data-slots-url="{{ url_for('api_slots') }}" data-selected-time="{{ form.time }}" data-exclude="{{ a['id'] }}">
+    {{ csrf_field() }}<input type="hidden" name="action" value="reschedule">
+    <h2>Reschedule</h2>
+    <div class="grid-2">
+      <div>
+        <label for="doctor">Doctor</label>
+        <select id="doctor" name="doctor" required>
+          {% for d in doctors %}
+            <option value="{{ d['id'] }}" {% if form.doctor|string == d['id']|string %}selected{% endif %}>{{ d['name'] }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label for="date">Date</label>
+        <input id="date" name="date" type="date" min="{{ min_date }}" max="{{ max_date }}" value="{{ form.date }}" required>
+      </div>
+    </div>
+    <p class="field-label" id="slots-label">Available times</p>
+    <div class="slots" id="slots" role="radiogroup" aria-labelledby="slots-label" aria-live="polite">
+      <p class="muted slots-msg">Loading times...</p>
+    </div>
+    <button class="btn btn-primary" type="submit">Move appointment</button>
+  </form>
+  {% else %}
+  <p class="muted">This appointment is {{ a['status']|lower }}, so it cannot be rescheduled.</p>
+  {% endif %}
+</div>
+{% endblock %}

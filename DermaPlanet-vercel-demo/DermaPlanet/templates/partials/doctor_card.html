@@ -1,0 +1,15 @@
+<article class="doctor-card">
+  {% if d['image'] %}
+    <img src="{{ url_for('static', filename=d['image']) }}" width="720" height="720" loading="lazy"
+         alt="Portrait of {{ d['name'] }}">
+  {% else %}
+    <div class="avatar" role="img" aria-label="{{ d['name'] }}">{{ d['name']|initials }}</div>
+  {% endif %}
+  <div class="doctor-body">
+    <h3>{{ d['name'] }}</h3>
+    <p class="doctor-spec">{{ d['specialization'] }}</p>
+    <p class="doctor-exp">{{ d['experience'] }} of experience</p>
+    {% if d['bio'] %}<p class="doctor-bio">{{ d['bio'] }}</p>{% endif %}
+    <a class="btn btn-outline" href="{{ url_for('appointment', doctor=d['id']) }}">Book appointment</a>
+  </div>
+</article>

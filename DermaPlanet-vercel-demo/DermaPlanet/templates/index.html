@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+  <div class="hero-copy">
+    <h1>Skin and hair care from dermatologists who explain every step.</h1>
+    <p class="lead">Book a consultation online, choose a time that suits you, and see the clinic's confirmation in your account.</p>
+    <div class="btn-row">
+      <a class="btn btn-primary btn-lg" href="{{ url_for('appointment') }}">Book appointment</a>
+      <a class="btn btn-ghost btn-lg" href="{{ url_for('doctors') }}">Meet our doctors</a>
+    </div>
+    <p class="hero-note">{{ clinic.hours }}. {{ clinic.closed }}.</p>
+  </div>
+
+  <div class="hero-visual">
+    <img src="{{ url_for('static', filename='images/hero.jpg') }}" width="1200" height="800"
+         alt="A dermatologist examining a patient's skin during a consultation">
+    {% if next_slot %}
+    <a class="next-slot" href="{{ url_for('appointment', doctor=next_slot.doctor['id'], date=next_slot.date) }}">
+      <span class="next-slot-label">Next available</span>
+      <strong>{{ next_slot.date|fdate }}</strong>
+      <span>{{ next_slot.time|ftime }} with {{ next_slot.doctor['name'] }}</span>
+    </a>
+    {% endif %}
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-head">
+    <h2>What we treat</h2>
+    <a class="text-link" href="{{ url_for('services') }}">All services</a>
+  </div>
+  <ul class="service-list">
+    {% for name, concern, text in services %}
+    <li>
+      <h3>{{ name }}</h3>
+      <p class="concern">{{ concern }}</p>
+      <p>{{ text }}</p>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+
+{% if doctors %}
+<section class="section section-tint">
+  <div class="section-head">
+    <h2>Your dermatologists</h2>
+    <a class="text-link" href="{{ url_for('doctors') }}">See all doctors</a>
+  </div>
+  <div class="doctor-grid">
+    {% for d in doctors %}
+      {% include "partials/doctor_card.html" %}
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<section class="section">
+  <h2>How booking works</h2>
+  <ol class="steps">
+    <li><strong>Create an account.</strong> It takes a minute and keeps your appointments in one place.</li>
+    <li><strong>Pick a doctor and a time.</strong> You only see slots that are actually free.</li>
+    <li><strong>Wait for confirmation.</strong> The clinic approves your request, and you can cancel anytime from your account.</li>
+  </ol>
+</section>
+
+<section class="cta-band">
+  <h2>Ready to see a dermatologist?</h2>
+  <a class="btn btn-light btn-lg" href="{{ url_for('appointment') }}">Book appointment</a>
+</section>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "admin/base_admin.html" %}
+{% block admin_title %}{{ 'Edit doctor' if doctor else 'Add doctor' }}{% endblock %}
+{% block admin_content %}
+<form class="form-card form-wide" method="post" enctype="multipart/form-data" novalidate>
+  {{ csrf_field() }}
+  <div class="grid-2">
+    <div>
+      <label for="name">Name</label>
+      <input id="name" name="name" type="text" maxlength="80" placeholder="Dr. Firstname Lastname" value="{{ vals.get('name', '') }}" required>
+    </div>
+    <div>
+      <label for="experience">Experience</label>
+      <input id="experience" name="experience" type="text" maxlength="40" placeholder="e.g. 7+ years" value="{{ vals.get('experience', '') }}" required>
+    </div>
+  </div>
+  <label for="specialization">Specialization</label>
+  <input id="specialization" name="specialization" type="text" maxlength="100" placeholder="e.g. Skin and laser treatment" value="{{ vals.get('specialization', '') }}" required>
+  <label for="bio">Short bio <span class="muted">(optional)</span></label>
+  <textarea id="bio" name="bio" rows="4" maxlength="600">{{ vals.get('bio', '') or '' }}</textarea>
+
+  <label for="image">Photo <span class="muted">(JPG, PNG or WebP, up to 4 MB{% if doctor %}; leave empty to keep the current one{% endif %})</span></label>
+  {% if doctor and doctor['image'] %}
+    <img class="current-photo" src="{{ url_for('static', filename=doctor['image']) }}" width="96" height="96" alt="Current photo of {{ doctor['name'] }}">
+  {% endif %}
+  <input id="image" name="image" type="file" accept="image/png,image/jpeg,image/webp">
+
+  {% if doctor %}
+  <label class="check">
+    <input type="checkbox" name="active" value="1" {% if doctor['active'] %}checked{% endif %}>
+    Show this doctor on the website and allow bookings
+  </label>
+  {% endif %}
+
+  <div class="btn-row">
+    <button class="btn btn-primary" type="submit">{{ 'Save changes' if doctor else 'Add doctor' }}</button>
+    <a class="btn btn-ghost" href="{{ url_for('admin_doctors') }}">Cancel</a>
+  </div>
+</form>
+{% endblock %}

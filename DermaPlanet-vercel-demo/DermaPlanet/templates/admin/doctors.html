@@ -1,0 +1,45 @@
+{% extends "admin/base_admin.html" %}
+{% block admin_title %}Doctors{% endblock %}
+{% block admin_content %}
+<div class="section-head">
+  <h2>{{ doctors|length }} doctor{{ '' if doctors|length == 1 else 's' }}</h2>
+  <a class="btn btn-primary" href="{{ url_for('add_doctor') }}">Add doctor</a>
+</div>
+{% if doctors %}
+<div class="table-wrap">
+  <table class="table">
+    <thead><tr><th>Doctor</th><th>Specialization</th><th>Experience</th><th>Visible</th><th>Bookings</th><th>Actions</th></tr></thead>
+    <tbody>
+    {% for d in doctors %}
+      <tr>
+        <td data-label="Doctor">
+          <div class="mini-doctor">
+            {% if d['image'] %}<img src="{{ url_for('static', filename=d['image']) }}" width="44" height="44" alt="">{% else %}<span class="avatar avatar-sm" aria-hidden="true">{{ d['name']|initials }}</span>{% endif %}
+            <strong>{{ d['name'] }}</strong>
+          </div>
+        </td>
+        <td data-label="Specialization">{{ d['specialization'] }}</td>
+        <td data-label="Experience">{{ d['experience'] }}</td>
+        <td data-label="Visible">{% if d['active'] %}<span class="badge badge-approved">Shown</span>{% else %}<span class="badge badge-cancelled">Hidden</span>{% endif %}</td>
+        <td data-label="Bookings">{{ d['appt_count'] }}</td>
+        <td data-label="Actions">
+          <div class="row-actions">
+            <a class="btn btn-sm btn-outline" href="{{ url_for('edit_doctor', doc_id=d['id']) }}">Edit</a>
+            <form method="post" action="{{ url_for('delete_doctor', doc_id=d['id']) }}" class="inline-form">
+              {{ csrf_field() }}
+              <button class="link link-danger" type="submit"
+                data-confirm="{% if d['appt_count'] %}This doctor has appointment history and will be hidden instead of deleted. Continue?{% else %}Delete {{ d['name'] }}?{% endif %}">
+                {% if d['appt_count'] %}Hide{% else %}Delete{% endif %}
+              </button>
+            </form>
+          </div>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+  <p class="empty">No doctors yet. <a href="{{ url_for('add_doctor') }}">Add the first one</a>.</p>
+{% endif %}
+{% endblock %}

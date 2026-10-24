@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}About | DermaPlanet{% endblock %}
+{% block content %}
+<section class="page-head">
+  <h1>About DermaPlanet</h1>
+  <p class="lead">A modern dermatology clinic for skin, hair and cosmetic care.</p>
+</section>
+<section class="section split">
+  <img src="{{ url_for('static', filename='images/clinic.jpg') }}" width="1000" height="667" loading="lazy"
+       alt="Inside the DermaPlanet clinic">
+  <div class="prose">
+    <p>DermaPlanet brings together experienced dermatologists and up-to-date technology so that you get a clear diagnosis and a plan you understand.</p>
+    <p>We keep consultations unhurried, explain the options and the likely results, and follow up so treatment can be adjusted when it needs to be.</p>
+    <h2>What you can expect</h2>
+    <ul class="ticks">
+      <li>Consultations with experienced dermatologists</li>
+      <li>Treatment plans built around your skin or hair, not a standard package</li>
+      <li>Online booking with real, live availability</li>
+      <li>Appointment status and history in your own account</li>
+    </ul>
+    <a class="btn btn-primary" href="{{ url_for('appointment') }}">Book appointment</a>
+  </div>
+</section>
+{% endblock %}
